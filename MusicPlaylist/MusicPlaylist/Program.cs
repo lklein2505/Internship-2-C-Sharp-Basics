@@ -24,8 +24,7 @@ namespace MusicPlaylist
 
             while (!exit)
             {
-                Console.WriteLine("Odaberite akciju:\n" +
-                "1 - Ispis cijele liste\n" +
+                Console.WriteLine("\n1 - Ispis cijele liste\n" +
                 "2 - Ispis imena pjesme unosom pripadajuceg rednog broja\n" +
                 "3 - Ispis rednog broja pjesme unosom pripadajuceg imena\n" +
                 "4 - Unos nove pjesme\n" +
@@ -34,7 +33,8 @@ namespace MusicPlaylist
                 "7 - Brisanje cijele liste\n" +
                 "8 - Uredivanje imena pjesme\n" +
                 "9 - Uredivanje rednog broja pjesme\n" +
-                "0 - Izlaz iz aplikacije\n");
+                "0 - Izlaz iz aplikacije\n" + 
+                "Odaberite akciju: ");
 
                 var choosenAction = int.Parse(Console.ReadLine());
                 switch (choosenAction)
@@ -58,10 +58,16 @@ namespace MusicPlaylist
                         DeleteByName(songDict);
                         break;
                     case 7:
-                        Console.WriteLine("Zelite izbrisati cijelu playlistu? (y/n)");
+                        Console.WriteLine("\nZelite izbrisati cijelu playlistu? (y/n)");
                         var confirmation = Console.ReadLine();
-                if (confirmation == "y")
-                        songDict.Clear();
+                        if (confirmation == "y")
+                            songDict.Clear();
+                        break;
+                    case 8:
+                        ChangeName(songDict);
+                        break;
+                    case 9:
+                        ChangeIndex(songDict);
                         break;
                     case 0:
                         exit = true;
@@ -84,11 +90,7 @@ namespace MusicPlaylist
             var indexNumber = int.Parse(Console.ReadLine());
 
             if (indexNumber > songDict.Count)
-            {
-                Console.WriteLine("Greska, nema pjesme pod tim rednim brojem! Zelite li se vratiti u pocetni izbornik? (y/n)");
-                if (Console.ReadLine() == "n")
-                    exit = true;
-            }
+                WrongIndexCase();
             else
             {
                 foreach (var pair in songDict)
@@ -96,7 +98,6 @@ namespace MusicPlaylist
                     if (indexNumber == pair.Key)
                         Console.WriteLine(pair.Value);
                 }
-                exit = true;
             }
         }
 
@@ -114,16 +115,14 @@ namespace MusicPlaylist
                 }
             }
             if (flag1 != 1)
-                Console.WriteLine("Pjesma s tim nazivom ne postoji! Zelite li se vratiti u pocetni izbornik? (y/n)");
-                if (Console.ReadLine() == "n")
-                    exit = true;
+                WrongNameCase();
         }
 
         static void AddNewSong(Dictionary<int, string> songDict)
         {
-            Console.WriteLine("Unesite ime pjesme koju zelite dodati u listu: ");
+            Console.WriteLine("\nUnesite ime pjesme koju zelite dodati u listu: ");
             var newSong = Console.ReadLine();
-            Console.WriteLine("Zelite dodati pjesmu '" + newSong + "' u playlistu? (y/n)");
+            Console.WriteLine("\nZelite dodati pjesmu '" + newSong + "' u playlistu? (y/n)");
             var confirmation = Console.ReadLine();
             if (confirmation == "y")
                 songDict.Add(songDict.Count + 1, newSong);
@@ -131,17 +130,13 @@ namespace MusicPlaylist
 
         static void DeleteByIndex(Dictionary<int, string> songDict)
         {
-            Console.WriteLine("Unesite redni broj pjesmu koju zelite izbrisati: ");
+            Console.WriteLine("\nUnesite redni broj pjesmu koju zelite izbrisati: ");
             var deleteIndex = int.Parse(Console.ReadLine());
             if (deleteIndex > songDict.Count)
-            {
-                Console.WriteLine("Greska, nema pjesme pod tim rednim brojem! Zelite li se vratiti u pocetni izbornik? (y/n)");
-                if (Console.ReadLine() == "n")
-                    exit = true;
-            }
+                WrongIndexCase();
             else
             {
-                Console.WriteLine("Zelite izbrisati pjesmu pod rednim brojem " + deleteIndex + "? (y/n)");
+                Console.WriteLine("\nZelite izbrisati pjesmu pod rednim brojem " + deleteIndex + "? (y/n)");
                 var confirmation = Console.ReadLine();
                 if (confirmation == "y")
                 {
@@ -162,7 +157,7 @@ namespace MusicPlaylist
 
         static void DeleteByName(Dictionary<int, string> songDict)
         {
-            Console.WriteLine("Upisite ime pjesme koju zelite izbrisati iz playliste: ");
+            Console.WriteLine("\nUpisite ime pjesme koju zelite izbrisati iz playliste: ");
             var deleteSong = Console.ReadLine();
             var flag2 = 0;
             foreach (var pair in songDict)
@@ -170,7 +165,7 @@ namespace MusicPlaylist
                 if (deleteSong == pair.Value)
                 {
                     flag2 = 1;
-                    Console.WriteLine("Zelite izbrisati pjesmu '" + deleteSong + "'? (y/n)");
+                    Console.WriteLine("\nZelite izbrisati pjesmu '" + deleteSong + "'? (y/n)");
                     var confirmation = Console.ReadLine();
                     if (confirmation == "y")
                     {
@@ -190,11 +185,97 @@ namespace MusicPlaylist
                 }
             }
             if (flag2 != 1)
+                WrongNameCase();
+        }
+
+        static void ChangeName(Dictionary<int, string> songDict)
+        {
+            Console.WriteLine("\nUnesite pjesmu kojoj zelite promijeniti ime: ");
+            var oldName = Console.ReadLine();
+            var flag3 = 0;
+            foreach (var pair in songDict)
             {
-                Console.WriteLine("Pjesma s tim nazivom ne postoji! Zelite li se vratiti u pocetni izbornik? (y/n)");
-                if (Console.ReadLine() == "n")
-                    exit = true;
+                if (oldName == pair.Value)
+                {
+                    flag3 = 1;
+                    var songIndex = pair.Key;
+
+                    Console.WriteLine("\nUnesite novo ime za odabranu pjesmu: ");
+                    var newName = Console.ReadLine();
+                    Console.WriteLine("\nZelite promijeniti ime pjesme '" + oldName + "' u '" + newName + "'? (y/n)");
+                    var confirmation = Console.ReadLine();
+                    if (confirmation == "y")
+                    {
+                        songDict[songIndex] = newName;
+                    }
+                    break;
+                }
             }
+            if (flag3 != 1)
+                WrongNameCase();
+        }
+
+        static void ChangeIndex(Dictionary<int, string> songDict)
+        {
+            Console.WriteLine("\nUnesite ime pjesme koju zelite premjestiti: ");
+            var songToMove = Console.ReadLine();
+            var flag4 = 0;
+            foreach (var pair in songDict)
+            {
+                if (songToMove == pair.Value)
+                {
+                    flag4 = 1;
+                    var oldIndex = pair.Key;
+
+                    Console.WriteLine("\nUnesite redni broj na koji zelite pomaknuti pjesmu '" + songToMove + "': ");
+                    var newIndex = int.Parse(Console.ReadLine());
+                    foreach(var item in songDict)
+                    {
+                        if (newIndex == item.Key)
+                        {
+                            Console.WriteLine("Zelite pomaknuti pjesmu '" + songToMove + "' na redni broj " + newIndex + "? (y/n)");
+                            var confirmation = Console.ReadLine();
+                            if (confirmation == "y")
+                            {
+                                if (oldIndex > newIndex)
+                                {
+                                    for (var i = oldIndex; i > newIndex; i--)
+                                        songDict[i] = songDict[i - 1];
+                                    songDict[newIndex] = songToMove;
+                                }
+                                else
+                                {
+                                    for (var j = oldIndex; j < newIndex; j++)
+                                        songDict[j] = songDict[j + 1];
+                                    songDict[newIndex] = songToMove;
+                                }
+                            }
+                            break;
+                        }
+                        if (newIndex > songDict.Count)
+                            flag4 = 2;
+                    }
+                    break;
+                }
+            }
+            if (flag4 == 0)
+                WrongNameCase();
+            if (flag4 == 2)
+                WrongIndexCase();
+        }
+
+        static void WrongNameCase()
+        {
+            Console.WriteLine("\nPjesma s tim nazivom ne postoji! Zelite li se vratiti u pocetni izbornik? (y/n)");
+            if (Console.ReadLine() == "n")
+                exit = true;
+        }
+
+        static void WrongIndexCase()
+        {
+            Console.WriteLine("\nGreska, ovaj redni broj ne postoji u playlisti! Zelite li se vratiti u pocetni izbornik? (y/n)");
+            if (Console.ReadLine() == "n")
+                exit = true;
         }
     }
 }
